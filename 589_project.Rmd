@@ -13,7 +13,7 @@ There is a total of 104,9411 occurrences recorded of Bold eagle or *Haliaeetus l
 
 Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurences of Bold eagle.
 
-```{r, include = FALSE}
+```{r, include=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 library(spatstat)
@@ -22,10 +22,10 @@ library(polyCub)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-load("BC_Covariates.Rda") # BC covariate data with window
+load("data/BC_Covariates.Rda") # BC covariate data with window
 
 # Reading in the occurrences data
-occurrence_eagles <- read_csv("Eagle_data/eagles_bc.csv") 
+occurrence_eagles <- read_csv("data/eagles_bc.csv") 
 ```
 
 Creating the `ppp` object and plotting the Bold eagle occurrences into the window.
