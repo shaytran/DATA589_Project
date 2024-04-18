@@ -1,17 +1,17 @@
 ---
-title: "Bold eagle in British Columbia - Spatial Exploration"
+title: "Bald eagle in British Columbia - Spatial Exploration"
 author: "Shayla Tran, Matthew Angoh & Kyle Deng"
 date: "2024-04-17"
 output: html_document
 ---
 
-# DATA 589 - Spatial Data Analysis on Bold eagle Occurrences in British Columbia
+# DATA 589 - Spatial Data Analysis on Bald eagle Occurrences in British Columbia
 
-There is a total of 104,9411 occurrences recorded of Bold eagle or *Haliaeetus leucocephalus (Linnaeus, 1766)* within Canada between 1848 and 2024. This data is directly downloaded from the source GBIF.
+There is a total of 104,9411 occurrences recorded of Bald eagle or *Haliaeetus leucocephalus (Linnaeus, 1766)* within Canada between 1848 and 2024. This data is directly downloaded from the source GBIF.
 
 ## 1) Processing of Raw Data
 
-Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurences of Bold eagle.
+Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurrences of Bold eagle.
 
 ```{r, include=FALSE, message=FALSE}
 # Load necessary libraries
@@ -32,7 +32,6 @@ Creating the `ppp` object and plotting the Bold eagle occurrences into the windo
 
 ```{r}
 window <- as.owin(DATA$Window) # Create an owin object with the window in the covariates dataset so it can be used to create the ppp object later
-occurrence_eagles_clean <- unique(occurrence_eagles[inside.owin(occurrence_eagles$X, occurrence_eagles$Y, w = window), ]) # Check which points lie inside the window and subset the occurrence_eagles dataset to keep only points inside the window
 
 # Create the ppp object
 eagles_ppp <- ppp(x = occurrence_eagles$X, y = occurrence_eagles$Y, window = window) # Obtain a ppp object with the coordinate and window data 
