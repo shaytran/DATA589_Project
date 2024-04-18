@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+packageId="ffb14d94-d7b3-4f2a-b449-af1ebf39131a"  system="http://gbif.org" scope="system"
+xml:lang="en">
+
+    <dataset>
+            <alternateIdentifier>10.15468/8raqsw</alternateIdentifier>
+                <alternateIdentifier>https://biodiverse-nb.ca/portal/collections/misc/collprofiles.php?collid=4</alternateIdentifier>
+        <title>New Brunswick Museum - Mammals</title>
+            <creator>
+<organizationName>New Brunswick Museum Collections</organizationName><electronicMailAddress>gregor.jongsma@gmail.com</electronicMailAddress><onlineUrl>https://biodiverse-nb.ca/portal/index.php</onlineUrl>            </creator>
+            <metadataProvider>
+<organizationName>New Brunswick Museum Collections</organizationName><electronicMailAddress>gregor.jongsma@gmail.com</electronicMailAddress><onlineUrl>https://biodiverse-nb.ca/portal/index.php</onlineUrl>            </metadataProvider>
+            <pubDate>
+                2024-04-15
+            </pubDate>
+        <language>ENGLISH</language>
+            <abstract>
+                    <para>The NBM mammal collection includes about 20,000 skins, skeletons, taxidermied mounts, frozen and dried tissues, and alcoholic specimens and is the largest mammal research collection in Atlantic Canada.  Most of the collection post-dates 1965.  There are good series of skeletons of small mammals from New Brunswick, Quebec, and Ontario, as well as New Brunswick fur-bearers. The collection is notable for its collection of Atlantic Canadian cetacea, which includes skeletons, anatomical samples, and frozen tissues.  Although largely consisting of eastern Canadian material, the collection also includes the Alward Collection of trophy mounts, a world-wide collection of well documented taxidermied large mammals.</para>
+            </abstract>
+            <intellectualRights>
+                    <para>This work is licensed under a <ulink url="http://creativecommons.org/licenses/by-nc/4.0/legalcode"><citetitle>Creative Commons Attribution Non Commercial (CC-BY-NC) 4.0 License</citetitle></ulink>.</para>
+            </intellectualRights>
+            <contact>
+<organizationName>New Brunswick Museum - Mammals</organizationName>            </contact>
+
+    </dataset>
+
+    <additionalMetadata>
+        <metadata>
+            <gbif>
+                <dateStamp>2024-04-17T23:22:59Z</dateStamp>
+                <citation>New Brunswick Museum (2024). New Brunswick Museum - Mammals. Occurrence dataset https://doi.org/10.15468/8raqsw accessed via GBIF.org on 2024-04-17.</citation>
+            </gbif>
+        </metadata>
+    </additionalMetadata>
+
+</eml:eml>

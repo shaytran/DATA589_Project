@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.2/eml.xsd"
+packageId="4bc6e742-69ea-4ed5-a6e5-21f674d9f884"  system="http://gbif.org" scope="system"
+xml:lang="en">
+
+    <dataset>
+            <alternateIdentifier>10.15468/nefklq</alternateIdentifier>
+                <alternateIdentifier>https://bellatlas.umn.edu:443/collections/misc/collprofiles.php?collid=6</alternateIdentifier>
+        <title>Bell Museum mammals</title>
+            <creator>
+<organizationName>Bell Atlas</organizationName><electronicMailAddress>_</electronicMailAddress><onlineUrl>https://bellatlas.umn.edu:443/index.php</onlineUrl>            </creator>
+            <metadataProvider>
+<organizationName>Bell Atlas</organizationName><electronicMailAddress>_</electronicMailAddress><onlineUrl>https://bellatlas.umn.edu:443/index.php</onlineUrl>            </metadataProvider>
+            <pubDate>
+                2024-04-01
+            </pubDate>
+        <language>ENGLISH</language>
+            <abstract>
+                    <para>Records of zoological specimens at J. F. Bell Museum of Natural Hitory (University of Minnesota)</para>
+            </abstract>
+            <intellectualRights>
+                    <para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode"><citetitle>Public Domain (CC0 1.0)</citetitle></ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+            </intellectualRights>
+            <contact>
+<organizationName>Bell Museum mammals</organizationName><onlineUrl>https://www.bellmuseum.umn.edu/mammals/</onlineUrl>            </contact>
+
+    </dataset>
+
+    <additionalMetadata>
+        <metadata>
+            <gbif>
+                <dateStamp>2024-04-17T23:23:03Z</dateStamp>
+                <citation>University of Minnesota Bell Museum (2024). Bell Museum mammals. Occurrence dataset https://doi.org/10.15468/nefklq accessed via GBIF.org on 2024-04-17.</citation>
+            </gbif>
+        </metadata>
+    </additionalMetadata>
+
+</eml:eml>
