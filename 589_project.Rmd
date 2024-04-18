@@ -11,7 +11,7 @@ There is a total of 104,9411 occurrences recorded of Bold eagle or *Haliaeetus l
 
 ## 1) Processing of Raw Data
 
-Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurences of Bold eagle.
+Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurrences of Bold eagle.
 
 ```{r, include=FALSE, message=FALSE}
 # Load necessary libraries
