@@ -1,67 +1,46 @@
 ---
-title: "Caribou in British Columbia - Spatial Exploration"
+title: "Bold eagle in British Columbia - Spatial Exploration"
 author: "Shayla Tran, Matthew Angoh & Kyle Deng"
 date: "2024-04-17"
 output: html_document
 ---
 
-# DATA 589 - Spatial Data Analysis on Caribou Occurrences in British Columbia
+# DATA 589 - Spatial Data Analysis on Bold eagle Occurrences in British Columbia
 
-There is a total of 4,031 occurrences recorded of Caribou or *Rangifer tarandus* within Canada between 1902 and 2024. This data is directly downloaded from the source GBIF.
+There is a total of 104,9411 occurrences recorded of Bold eagle or *Haliaeetus leucocephalus (Linnaeus, 1766)* within Canada between 1848 and 2024. This data is directly downloaded from the source GBIF.
 
 ## 1) Processing of Raw Data
 
-Here, we load in the `BC_Covariates.Rda` data. We will also read in the `occurrences.txt` dataset which contains all the occurrences recorded between 1902 and 2024 in Canada of Caribou. We will filter out for only **British Columbia**, the **longitude** and **latitude** coordinates. 
+Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurences of Bold eagle.
 
-```{r, include = FALSE}
+```{r, include=FALSE, message=FALSE}
 # Load necessary libraries
 library(tidyverse)
 library(spatstat)
 library(sf)
-library(sp)
+library(polyCub)
 ```
 
-```{r}
-load("BC_Covariates.Rda") # BC covariate data with window
+```{r, warning=FALSE, message=FALSE}
+load("data/BC_Covariates.Rda") # BC covariate data with window
 
 # Reading in the occurrences data
-occurrence_raw <- read.table("caribou_data/occurrence.txt", header=TRUE, sep="\t", stringsAsFactors=FALSE, fill=TRUE)
-head(occurrence_raw)
-
-# Filtering for only coordinates data and for BC only
-occurrence <- occurrence_raw %>% 
-  filter(stateProvince == "British Columbia") %>% 
-  select(decimalLatitude, decimalLongitude) %>% 
-  filter(!is.na(decimalLatitude) & decimalLatitude != "" & !is.na(decimalLongitude) & decimalLongitude != "") # Dropping the rows with empty coordinate values
-head(occurrence) # Final dataframe of just the coordinate data
+occurrence_eagles <- read_csv("data/eagles_bc.csv") 
 ```
 
-Creating the `ppp` object and plotting the caribou occurrences into the window. Note that we have to obtain the CRS (coordinate reference system) within `DATA$Window` and then convert our latitude and longitude data to fit the values within that CRS.
+Creating the `ppp` object and plotting the Bold eagle occurrences into the window.
 
 ```{r}
-# Convert latitude and longitude to numeric
-occurrence$decimalLatitude <- as.numeric(as.character(occurrence$decimalLatitude))
-occurrence$decimalLongitude <- as.numeric(as.character(occurrence$decimalLongitude))
-
-# Get the CRS of the Window and transforming the longitude + latitude data into the same CRS as DATA$Window
-window_crs <- proj4string(DATA$Window)
-coordinates(occurrence) <- ~decimalLongitude + decimalLatitude
-proj4string(occurrence) <- CRS("+proj=longlat +datum=WGS84") # Define the CRS for the occurrence data as WGS 84
-occurrence_transformed <- spTransform(occurrence, CRS(window_crs))
-occurrence_coords <- coordinates(occurrence_transformed) # Extract coordinates from the transformed SpatialPoints object
+window <- as.owin(DATA$Window) # Create an owin object with the window in the covariates dataset so it can be used to create the ppp object later
+occurrence_eagles_clean <- unique(occurrence_eagles[inside.owin(occurrence_eagles$X, occurrence_eagles$Y, w = window), ]) # Check which points lie inside the window and subset the occurrence_eagles dataset to keep only points inside the window
 
 # Create the ppp object
-bc_sf <- st_as_sf(DATA$Window) # Convert SpatialPolygonsDataFrame to sf object
-window_owin <- as.owin(bc_sf) # Convert the DATA$Window to an owin object
-caribou_ppp <- ppp(x = occurrence_coords[,1], y = occurrence_coords[,2], window = window_owin)
+eagles_ppp <- ppp(x = occurrence_eagles$X, y = occurrence_eagles$Y, window = window) # Obtain a ppp object with the coordinate and window data 
 
 # Plot the ppp object
-plot(window_owin, main = "BC Parks with Caribou Occurrences")
-points(caribou_ppp, col = 'red', pch = 16)
-```
-
-```{r}
-
-
+plot(eagles_ppp,
+     cols = 4,
+     pch = 16,
+     main = "Eagles occurrence data in BC")
 ```
 
