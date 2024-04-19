@@ -5,11 +5,9 @@ date: "2024-04-17"
 output: html_document
 ---
 
-# DATA 589 - Spatial Data Analysis on Bald eagle Occurrences in British Columbia
+There is a total of 104,941 occurrences recorded of Bald eagle or *Haliaeetus leucocephalus (Linnaeus, 1766)* within Canada between 1848 and 2024. This data is directly downloaded from the source GBIF.
 
-There is a total of 104,9411 occurrences recorded of Bald eagle or *Haliaeetus leucocephalus (Linnaeus, 1766)* within Canada between 1848 and 2024. This data is directly downloaded from the source GBIF.
-
-## 1) Processing of Raw Data
+## 1) Initial Data Inspection and Data Exploration
 
 Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurrences of Bold eagle.
 
@@ -23,12 +21,10 @@ library(polyCub)
 
 ```{r, warning=FALSE, message=FALSE}
 load("data/BC_Covariates.Rda") # BC covariate data with window
-
-# Reading in the occurrences data
-occurrence_eagles <- read_csv("data/eagles_bc.csv") 
+occurrence_eagles <- read_csv("data/eagles_bc.csv") # Reading in the occurrences data
 ```
 
-Creating the `ppp` object and plotting the Bold eagle occurrences into the window.
+Creating the `ppp` object and plotting the Bald eagle occurrences into the BC window.
 
 ```{r}
 window <- as.owin(DATA$Window) # Create an owin object with the window in the covariates dataset so it can be used to create the ppp object later
@@ -40,6 +36,59 @@ eagles_ppp <- ppp(x = occurrence_eagles$X, y = occurrence_eagles$Y, window = win
 plot(eagles_ppp,
      cols = 4,
      pch = 16,
-     main = "Eagles occurrence data in BC")
+     main = "Eagles occurrence data in BC",
+     cex = 0.5)
 ```
+
+From the initial plot, we can see that the eagles tend to be near the southern regions and there are some densities along the coast and within the interior region.
+
+The BC covariates provided are:
+
+* HFI (Human Foot Index): influence of humans on the land
+* Elevation: land elevation
+* Forest: forested areas
+* Dist_water: distance to water sources or bodies of water
+
+To explore these covariates, we will create plots that show the eagle occurrences along with the covariate data within the window. Each covariate image will be split into 3 elevation classes (for now).
+
+```{r, hide=TRUE}
+# Plotting the covariates (for comparisons later)
+plot(DATA$Elevation, main = "Elevation")
+plot(DATA$Forest, main = "Forest Coverage")
+plot(DATA$HFI, main = "Human Foot Index")
+plot(DATA$Dist_Water, main = "Distance to Water Sources")
+```
+
+```{r}
+# Fitting classes to elevation data
+elev_classes <- cut(DATA$Elevation,
+                    3,
+                    labels = c("low", "medium", "high"))
+# Plotting classes with eagle occurrence overlay
+plot(elev_classes, main = "Elevation Classes with Eagle Occurrences")
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'black', cex = 0.5)
+
+# Fitting classes to HFI data
+hfi_classes <- cut(DATA$HFI,
+                    3,
+                    labels = c("low", "medium", "high"))
+plot(hfi_classes, main = "HFI Classes with Eagle Occurrences")
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'red', cex = 0.5)
+
+# Fitting classes to Dist_Water data
+water_classes <- cut(DATA$Dist_Water,
+                    3,
+                    labels = c("low", "medium", "high"))
+plot(water_classes, main = "Distance to Water Classes with Eagle Occurrences")
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'red', cex = 0.5)
+
+# Fitting classes to Forest data
+forest_classes <- cut(DATA$Forest,
+                    3,
+                    labels = c("low", "medium", "high"))
+plot(forest_classes, main = "Forest Coverage Classes with Eagle Occurrences")
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'black', cex = 0.5)
+```
+
+It is difficult to discern the relationship between eagle occurrences and distance to water as well as HFI. There is some suggestion that the eagles tend to stray away from elevation, mostly staying within the 'low' to 'medium' elevation areas. Additionally, for forested areas, we can see that the eagle occurrences typically are located in 'high' areas of forest coverage. 
 
