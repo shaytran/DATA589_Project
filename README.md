@@ -2,7 +2,7 @@
 Authors: [Shayla Tran](https://github.com/shaytran), [Kyle Deng](https://github.com/kt1720), and [Matthew Angoh](https://github.com/mattangoh)
 
 ### Materials
-1. [Final Report]([https://docs.google.com/document/d/1iAYaF60E2SaE3Sui7MzJriaIPZJeps9ty-6np5Zf-nQ/edit?usp=sharing](https://docs.google.com/document/d/1DklH4858WhwPIeSn-WrS2D9ETP8_NYhxy3HKNeKvrLc/edit?usp=sharing))
+1. [Final Report](https://docs.google.com/document/d/1DklH4858WhwPIeSn-WrS2D9ETP8_NYhxy3HKNeKvrLc/edit?usp=sharing)
 
 ## Table of Contents
 1. [Introduction](#introduction)
