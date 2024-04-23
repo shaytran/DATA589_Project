@@ -66,6 +66,7 @@ elev_classes <- cut(DATA$Elevation,
                     labels = c("low", "medium", "high"))
 # Plotting classes with eagle occurrence overlay
 plot(elev_classes, main = "Elevation Classes with Eagle Occurrences")
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'white', cex = 0.7)
 points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'black', cex = 0.5)
 
 # Fitting classes to HFI data
@@ -73,22 +74,175 @@ hfi_classes <- cut(DATA$HFI,
                     3,
                     labels = c("low", "medium", "high"))
 plot(hfi_classes, main = "HFI Classes with Eagle Occurrences")
-points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'red', cex = 0.5)
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'white', cex = 0.7)
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'black', cex = 0.5)
 
 # Fitting classes to Dist_Water data
 water_classes <- cut(DATA$Dist_Water,
                     3,
                     labels = c("low", "medium", "high"))
 plot(water_classes, main = "Distance to Water Classes with Eagle Occurrences")
-points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'red', cex = 0.5)
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'white', cex = 0.7)
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'black', cex = 0.5)
 
 # Fitting classes to Forest data
 forest_classes <- cut(DATA$Forest,
                     3,
                     labels = c("low", "medium", "high"))
 plot(forest_classes, main = "Forest Coverage Classes with Eagle Occurrences")
+points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'white', cex = 0.7)
 points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'black', cex = 0.5)
 ```
 
 It is difficult to discern the relationship between eagle occurrences and distance to water as well as HFI. There is some suggestion that the eagles tend to stray away from elevation, mostly staying within the 'low' to 'medium' elevation areas. Additionally, for forested areas, we can see that the eagle occurrences typically are located in 'high' areas of forest coverage. 
+
+2) Exploratory Data Analysis
+
+We will do some first moment descriptive statistics - obtaining the intensity ($\lambda$) of eagle occurrences. 
+
+```{r}
+intensity <- intensity(eagles_ppp)
+win_km <- rescale(Window(eagles_ppp), 1000, "km") # Rescale the window to units of km
+npoints(eagles_ppp)/area(win_km) # Intensity in parks/km^2
+```
+
+The intensity of eagle occurrences per km$^2$ in BC is 0.005272802 eagles per km (under the assumption of homogeneity). Based on the previous visualizations, we suspect that there is spatial variation of the eagle occurrences ($\lambda$ is spatially varying), so we will estimate the intensity in each quadrat by counting the number of eagle occurrences in each quadrat divided by the quadrat's area. This will help us determine if the assumption of homogeneity is met. 
+
+```{r}
+# Split into a 10 by 10 quadrat and count points, then perform the quadrat test
+Q <- quadratcount(eagles_ppp,
+                  nx = 10,
+                  ny = 10)
+quadrat.test(Q)
+
+# Visualizing both the quadrats and estimated intensity, with points
+plot(Q, main = "Quadrat counts and eagle occurrence points")
+points(eagles_ppp, pch = 20, col = 'red', cex = 0.5) 
+
+intensity_map <- density(eagles_ppp)
+plot(intensity_map, main = "Estimated intensity and eagle occurrence points")
+points(eagles_ppp, pch = 20, col = 'white', cex = 0.7) 
+points(eagles_ppp, pch = 20, col = 'black', cex = 0.5) 
+```
+
+We can see that the assumption of homogeneity does not hold for this dataset as the eagle occurrences tend to be clustered in some areas (like the southern coast area) whereas some areas have none at all. The quadrat counting suggests a spatially varying, inhomogeneous $\lambda(u)$. Note that we do expect some variation by chance alone due to point processes being stochastic. The p-value resulting from testing for significant deviations is significant, indicating there there *is* significant deviation from homogeneity.
+
+Next, we'll use kernel estimation to also estimate spatially varying $\lambda(u)$.
+
+```{r}
+# Estimate the intensity with likelihood cross-validation for bandwidth selection and plotting
+lambda_u_hat <- density(eagles_ppp, adjust=1, bw="likelihood")
+plot(lambda_u_hat, main = "Kernel estimate of Eagle Occurence intensity")
+plot(eagles_ppp, pch = 16, cex = 0.7, col = "white", add = TRUE)
+plot(eagles_ppp, pch = 16, cex = 0.5, col = "black", add = TRUE)
+```
+
+The plot looks similar to that of the estimated intensity without the kernel estimation.
+
+We can do a hot spot analysis to identify areas of elevated intensity to see where the eagle occurrences are concentrated.
+
+```{r}
+# Performing the hotspot analysis
+R <- bw.ppl(eagles_ppp) # Estimate bandwidth for radius for scan test
+LR <- scanLRTS(eagles_ppp, r = R) # Calculate the likelihood ratio test statistic
+plot(LR, clipwin = eagles_ppp$window, main = "Likelihood Ratio Test Statistic for Eagle Occurrences") # Plot the test statistic
+
+# Compute and plotting local p-values
+pvals <- eval.im(pchisq(LR, df = 1, lower.tail = FALSE))
+plot(pvals, main = "Local p-values for BC Parks", clipwin = eagles_ppp$window)
+```
+
+Interestingly, we do not see any particular 'hot spots' for eagle occurrences. When showing the local p-values, we do some scattered points with very low p-values that visibly seem to be around the lower half and within the interior of the BC. 
+
+To investigate whether the intensity depends on the covariates, we will estimate $\rho$.
+
+```{r}
+# Extracting the covariate information
+elevation <- DATA$Elevation
+water <- DATA$Dist_Water
+forest <- DATA$Forest
+hfi <- DATA$HFI
+
+# Estimate Rho and plotting
+rho_elev <- rhohat(eagles_ppp, elevation)
+plot(rho_elev, xlab="Elevation (m)", ylab="Intensity (rho)", main="Rho vs. Elevation", xlim=c(0, max(rho_elev$elevation)))
+
+rho_water <- rhohat(eagles_ppp, water)
+plot(rho_water, xlab="Distance to Water (m)", ylab="Intensity (rho)", main="Rho vs. Distance to Water", xlim=c(0, max(rho_water$water)))
+
+rho_forest <- rhohat(eagles_ppp, forest)
+plot(rho_forest, xlab="Forest Coverage (%)", ylab="Intensity (rho)", main="Rho vs. Forest Coverage", xlim=c(0, max(rho_forest$forest)))
+
+rho_hfi <- rhohat(eagles_ppp, hfi)
+plot(rho_hfi, xlab="HFI", ylab="Intensity (rho)", main="Rho vs. HFI", xlim=c(0, max(rho_hfi$hfi)))
+```
+
+From the plots, we can see that eagles don't seem to stay around high elevated areas and they typically prefer lower forest coverage (ie. 20%). Interestingly, we can see that there is some elevated intensity of eagle occurrences in areas of higher HFI. As for distance to water, there isn't any notable evidence on whether eagles prefer to be closer to water or not, it seems as if they are rather spread out in areas close and not so close to water. 
+
+We will now proceed by doing second moment statistics. We want to investigate the relationship between points.
+
+We will use the Ripley's K-function to quantify the spatial dependence within our point pattern dataset to describe how the average number of additional events within a certain distance of a typical event compares to what would be expected under complete spatial randomness (CSR). 
+
+```{r}
+# Using Ripley's K-function and testing for a significant correlation
+k_parks <- Kest(eagles_ppp, correction="border")
+k_parks # Print summary
+
+# For alpha = 0.05
+E_eagles <- envelope(eagles_ppp, Kest, correction="border", nsim=19, verbose=FALSE, savefuns=TRUE)
+plot(E_eagles, main="", lwd=2)
+
+# Estimate a strictly positive density
+lambda_eagles_pos <- density(eagles_ppp,
+                          sigma=bw.ppl,
+                          positive=TRUE)
+
+# Simulation envelope (with points drawn from the estimated intensity)
+E_eagles_inhom <- envelope(eagles_ppp,
+                        Kinhom,
+                        simulate = expression(rpoispp(lambda_eagles_pos)),
+                        correction="border",
+                        rank = 1,
+                        nsim = 19,
+                        fix.n = TRUE)
+
+# visualise the results
+par(mfrow = c(1,2))
+plot(E_eagles_inhom,
+     main = "",
+     lwd = 2)
+
+# Zoom in on range where significant deviations appear
+plot(E_eagles_inhom,
+     xlim = c(0, 150000),
+     main = "",
+     lwd = 2)
+```
+
+The black line (empirical $K$-function) devaites significantly from the grey area and the theoretical red line. This suggests that there is a departure from Complete Spatial Randomness, indicating that there is spatial correlation at certain scales (at some eagle occurrences locations). The estimators still assume homogeneity, which we relaxed via the `Kinhom()` function.
+
+When corrected for homogeneity, we don't see evidence of clustering as the black line still seems to stay within the shaded area. Between 0 m and 75000 m, there seems to be some slight potential for clustering as the black line seems to lay right along the border of the shaded area, but it may not be enough to be significant. In other words, we can deduce that there is no evidence of clustering of eagle occurrences based on these plots. 
+
+We will move on with a pair correlation function which gives localized information about the spatial structure at exactly a certain distance.
+
+```{r}
+# Estimate a strictly positive density for inhomogeneous correction
+lambda_eagles_pos <- density(eagles_ppp, sigma=bw.ppl(eagles_ppp), positive=TRUE) 
+
+# Simulation-based envelope test for the inhomogeneous and homogenous pair correlation function
+pcf_eagles_inhom_env <- envelope(eagles_ppp,
+                          fun=pcfinhom,
+                          simulate = expression(rpoispp(lambda_eagles_pos)),
+                          rank = 1,
+                          nsim = 19)
+
+pcf_eagles_hom_env <- envelope(eagles_ppp,
+                          fun=pcf,
+                          rank = 1,
+                          nsim = 19)
+
+# Visualizing the results
+plot(pcf_eagles_hom_env, main="Homogeneous PCF with Simulation Envelope for Eagle Occurrences")
+plot(pcf_eagles_inhom_env, main="Inhomogeneous PCF with Simulation Envelope for Eagle Occurrences")
+```
 
