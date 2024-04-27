@@ -9,7 +9,7 @@ There is a total of 104,941 occurrences recorded of Bald eagle or *Haliaeetus le
 
 ## 1) Initial Data Inspection and Data Exploration
 
-Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurrences of Bold eagle.
+Here, we load in the `BC_Covariates.Rda` data. We will also read in the `eagles_bc.csv` dataset which contains 5000 sample occurrences of Bald eagle.
 
 ```{r, include=FALSE, message=FALSE}
 # Load necessary libraries
@@ -96,7 +96,7 @@ points(eagles_ppp$x, eagles_ppp$y, pch = 20, col = 'black', cex = 0.5)
 
 It is difficult to discern the relationship between eagle occurrences and distance to water as well as HFI. There is some suggestion that the eagles tend to stray away from elevation, mostly staying within the 'low' to 'medium' elevation areas. Additionally, for forested areas, we can see that the eagle occurrences typically are located in 'high' areas of forest coverage. 
 
-2) Exploratory Data Analysis
+## 2) Exploratory Data Analysis
 
 We will do some first moment descriptive statistics - obtaining the intensity ($\lambda$) of eagle occurrences. 
 
@@ -156,7 +156,7 @@ Interestingly, we do not see any particular 'hot spots' for eagle occurrences. W
 
 To investigate whether the intensity depends on the covariates, we will estimate $\rho$.
 
-```{r}
+```{r, warning=F}
 # Extracting the covariate information
 elevation <- DATA$Elevation
 water <- DATA$Dist_Water
@@ -244,5 +244,28 @@ pcf_eagles_hom_env <- envelope(eagles_ppp,
 # Visualizing the results
 plot(pcf_eagles_hom_env, main="Homogeneous PCF with Simulation Envelope for Eagle Occurrences")
 plot(pcf_eagles_inhom_env, main="Inhomogeneous PCF with Simulation Envelope for Eagle Occurrences")
+```
+
+
+
+## 3) Fitting Poisson point process model on the eagle point patterns
+
+Since from the analysis of first moment descriptive statistics on bald eagle occurrences, we found that the intensity $\lambda(u)$ is inhomogeneous, which indicates $\lambda(u)$ is not constant in space but rather a function of some covariate(s).
+
+Now we will model $\rho$ with the covariates, we will first make sure there is no colinearity between the covariates that will cause poor estimates of the regression coefficients. 
+
+```{r}
+cor.im(DATA[2:5], use = "pairwise.complete.obs")
+```
+The correlation coeffient between each pair of covariates are relatively weak, therefore, there is not too much concern on colinearity.
+
+Before fitting a poisson process model on the data, we will begin by examining the relationship between the covariates and $\lambda(u)$ (number of bald eagles per km$^2$).
+
+From the estimate of $\rho$ in the analysis of first moment descriptive statistics, we found that elevation, HFI and forest coverage exhibit a quadratic relationship with the number of bald eagles. And there isn't relationship between distance to water and the number of bald eagles.
+
+So our initial guess of the model would be:
+$$\lambda_{Eagle}(u)=e^{\beta_0+\beta_1\ elevation(u)+\beta_2\ elevation(u)^2+\beta_3\ forest\ cover(u)+\beta_4\ forest\ cover(u)^2+\beta_5\ HFI(u)+\beta_6\ HFI(u)^2}$$
+```{r}
+(fit <- ppm(eagles_ppp ~ Elevation + I(Elevation^2) + Forest + I(Forest^2) + HFI + I(HFI^2), data = DATA))
 ```
 
