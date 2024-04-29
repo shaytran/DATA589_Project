@@ -312,12 +312,17 @@ Based on these initial partial residual plots, we can see that our initial guess
 
 Since these appear to be a bit more complex relationships, an appropriate measure could be to try to use splines with some degrees of freedom. Again, we should check the resulting ANOVA and compare the new model with splines to the initial guess, and also find the AIC.
 
+$$
+\lambda_{\text{Eagle}}(u) = \exp\left(\beta_0 + f_1(\text{elevation}(u)) + f_2(\text{forest cover}(u)) + \beta_5 HFI(u) + \beta_6 HFI(u)^2\right)
+$$
+
+
 ```{r}
 
 library(splines)
 
 # Testing  Model Complexity
-fit2 <- ppm(eagles_ppp ~ bs(Elevation, df=8) + bs(Forest, df= 10) + HFI + I(HFI^2), data = DATA, use.gam = TRUE)
+fit2 <- ppm(eagles_ppp ~ Elevation * (Elevation^2) *bs(Elevation, df=20) + Forest * bs(Forest, df= 10) + HFI + I(HFI^2), data = DATA, use.gam = TRUE)
 
 anova(fit, fit2, test = "LR")
 AIC(fit) - AIC(fit2)
@@ -357,12 +362,11 @@ With that being said, we can now go on to plot the actual model fit.
 Plotting the Model Fit compared to the distribution from our ppp object
 
 ```{r}
-par(mfrow = c(1,2))
 plot(fit2,
      se = FALSE,
      superimpose = FALSE,
      log = TRUE,
-     n = 100)
+     n = 1000)
 plot(eagles_ppp,
      cols = 4,
      pch = 16,
@@ -389,7 +393,8 @@ Looking at the Residuals
 res <- residuals(fit2, drop = TRUE)
 
 plot(res,
-     cols = "transparent")
+     cols = "transparent",
+     main = "Residuals of ppm")
 ```
 Here, the overall residuals indicate that, particularly near the southern coast, the model significnatly struggles in predicting the intensity of eagles. In other areas, it appears to be performing fairly well, but there are some spot instances of poorer performance. Overall, however, this is a decent performing model.
 
@@ -400,7 +405,7 @@ The fit using the splines and quadratic terms indicates that the distribution of
 ```{r}
 
 # Testing  Model Complexity
-fit3 <- ppm(eagles_ppp ~ bs(Elevation, df=8) + bs(Forest, df= 10) + HFI + I(HFI^2) + Dist_Water, data = DATA, use.gam = TRUE)
+fit3 <-  ppm(eagles_ppp ~ Elevation * (Elevation^2) *bs(Elevation, df=20) + Forest * bs(Forest, df= 10) + HFI + I(HFI^2) + Dist_Water, data = DATA, use.gam = TRUE)
 
 par_res_elev <- parres(fit3, "Elevation")
 par_res_forest <- parres(fit3, "Forest")
