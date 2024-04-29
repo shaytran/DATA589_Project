@@ -266,6 +266,168 @@ From the estimate of $\rho$ in the analysis of first moment descriptive statisti
 So our initial guess of the model would be:
 $$\lambda_{Eagle}(u)=e^{\beta_0+\beta_1\ elevation(u)+\beta_2\ elevation(u)^2+\beta_3\ forest\ cover(u)+\beta_4\ forest\ cover(u)^2+\beta_5\ HFI(u)+\beta_6\ HFI(u)^2}$$
 ```{r}
-(fit <- ppm(eagles_ppp ~ Elevation + I(Elevation^2) + Forest + I(Forest^2) + HFI + I(HFI^2), data = DATA))
+fit <- ppm(eagles_ppp ~ Elevation + I(Elevation^2) + Forest + I(Forest^2) + HFI + I(HFI^2), data = DATA)
+fitnull <- ppm(eagles_ppp, data = DATA)
+
+```
+AIC/ANOVA
+
+Next, we conduct an anova as well as find AIC values for the null fit and the initial guess fit.
+
+```{r}
+anova(fitnull, fit, test = 'LR')
+AIC(fitnull) - AIC(fit)
 ```
 
+Based on these values, we see that 1) the Anova shows that the increased complexity is warranted. Additionally 2) the AIC is positive which indicates that the fit null had a higher AIC than the initial guess fit. Both of these things indicate that we have chosen a fit that is at least better than a null fit.
+
+To determine next whether this is optimally capturing the patterns of the covariates appropriately, we should visualize the partial residuals of each component.
+
+```{r}
+par_res_elev <- parres(fit, "Elevation")
+par_res_forest <- parres(fit, "Forest")
+par_res_hfi <- parres(fit, "HFI")
+
+par(mfrow = c(2,2))
+plot(par_res_elev,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "Elevation (m)")
+plot(par_res_forest,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "Forest Coverage (%)")
+plot(par_res_hfi,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "HFI Levels")
+
+
+```
+
+Based on these initial partial residual plots, we can see that our initial guess was fairly decent for HFI levels, but we can clearly see that there is some complex patterns that are not quite being captured by the model for Elevation and Fores Coverage.
+
+Since these appear to be a bit more complex relationships, an appropriate measure could be to try to use splines with some degrees of freedom. Again, we should check the resulting ANOVA and compare the new model with splines to the initial guess, and also find the AIC.
+
+```{r}
+
+library(splines)
+
+# Testing  Model Complexity
+fit2 <- ppm(eagles_ppp ~ bs(Elevation, df=8) + bs(Forest, df= 10) + HFI + I(HFI^2), data = DATA, use.gam = TRUE)
+
+anova(fit, fit2, test = "LR")
+AIC(fit) - AIC(fit2)
+
+par_res_elev <- parres(fit2, "Elevation")
+par_res_forest <- parres(fit2, "Forest")
+par_res_hfi <- parres(fit2, "HFI")
+
+par(mfrow = c(2,2))
+plot(par_res_elev,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "Elevation (m)")
+plot(par_res_forest,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "Forest Coverage (%)")
+plot(par_res_hfi,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "HFI Levels")
+
+```
+There is a lot to unpack here, but the key takeaways are:
+
+1) We see from the ANOVA that the added complexity incorporating splines was significant and thus warranted.
+
+2) we see that the difference in AIC between the initial guess and the spline guess was positive, indicating that the added complexity using splines was a more optimal fit to the data.
+
+3) Based on the partial residuals plot, we can see that this tends to better capture the trends seen in the data (at least visually). We see more of an overlap of the dashed line and the curve. This indicates that the patterns are being captured well. Now, it is important to note that although this is better than the initial guess, there may be some room for improvement. However, this is already looking fairly reasonable. The choice of degrees of freedom (df) were set fairly high to allow for increased flexibility in the fitting process. I did tinker with this a bit to try and find an optimal fit.
+
+With that being said, we can now go on to plot the actual model fit.
+
+Plotting the Model Fit compared to the distribution from our ppp object
+
+```{r}
+par(mfrow = c(1,2))
+plot(fit2,
+     se = FALSE,
+     superimpose = FALSE,
+     log = TRUE,
+     n = 100)
+plot(eagles_ppp,
+     cols = 4,
+     pch = 16,
+     main = "Eagles occurrence data in BC",
+     cex = 0.5)
+```
+Just based off initial visual inspection, it appears to be doing a decent job at modelling the ppp object which is expected since the partial residuals was fit, generally, quite well.
+
+Quadrat Test
+
+```{r}
+quadrat.test(fit, nx = 2, ny = 4)
+
+```
+The small p value indicates that the data  significant deviates from the model...This test indicates that there is definitely some room for improving the model fit. However, it is important to note that this is subject to choices like quadrat size.
+
+
+But let's take a closer look at the residuals. 
+
+Looking at the Residuals
+
+```{r}
+#Calculate the residuals
+res <- residuals(fit2, drop = TRUE)
+
+plot(res,
+     cols = "transparent")
+```
+Here, the overall residuals indicate that, particularly near the southern coast, the model significnatly struggles in predicting the intensity of eagles. In other areas, it appears to be performing fairly well, but there are some spot instances of poorer performance. Overall, however, this is a decent performing model.
+
+The fit using the splines and quadratic terms indicates that the distribution of eagles is correlated to elevation, forests, and HFI in a non-linear fashion. We also found that distance to water had no relationship to the intensity of eagles. To illustrate this, consider the below:
+
+
+
+```{r}
+
+# Testing  Model Complexity
+fit3 <- ppm(eagles_ppp ~ bs(Elevation, df=8) + bs(Forest, df= 10) + HFI + I(HFI^2) + Dist_Water, data = DATA, use.gam = TRUE)
+
+par_res_elev <- parres(fit3, "Elevation")
+par_res_forest <- parres(fit3, "Forest")
+par_res_hfi <- parres(fit3, "HFI")
+par_res_water <- parres(fit3, "Dist_Water")
+
+
+par(mfrow = c(2,2))
+plot(par_res_elev,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "Elevation (m)")
+plot(par_res_forest,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "Forest Coverage (%)")
+plot(par_res_hfi,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "HFI Levels")
+plot(par_res_water,
+     legend = FALSE,
+     lwd = 2,
+     main = "",
+     xlab = "Distance to Water")
+```
+The key illustration here is that water is completely flat, and thus is not correlated whatsoever to the intensity of Eagles. Thus, we should simply choose to omit this covariate from the model, and just use fit2.
