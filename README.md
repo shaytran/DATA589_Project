@@ -47,7 +47,7 @@ The Ripley's K-function corrected for inhomogeneity assumption shows no signific
 ## Model Comparison and Interpretation
 From the analysis of first moment descriptive statistics on bald eagle occurrences, we found that the intensity is inhomogeneous, which indicates that intensity is not constant in space but rather a function of some covariate(s). 
 From the estimate of rhohat in the analysis of first moment descriptive statistics, it appears that elevation, HFI and forest coverage exhibit a non-linear relationship with the number of bald eagles. There isn't a relationship between distance to water and the number of bald eagles. So our initial guess of the model is a Poisson process model with both linear and quadratic terms of elevation, HFI and forest coverage. The resulting partial residuals are displayed below:
-![](https://github.com/shaytran/DATA589_Project/blob/main/images/initialpr.png)
+![](https://github.com/shaytran/DATA589_Project/blob/main/images/initial_pr.png)
 
 The initial guess was fairly decent for HFI levels, but there are some clear complex patterns that are not being captured by the model for elevation and forest coverage. Since the partial residuals suggest a more complex relationships, an appropriate measure we propose is to use splines with some degrees of freedom. The complex model includes a spline function of elevation with 20 degrees of freedom and forest coverage with 10 degrees of freedom, while keeping the HFI parameters the same as the previous model. The resulting partial residuals from the more complex model are displayed below:
 ![](https://github.com/shaytran/DATA589_Project/blob/main/images/complex_pr.png)
