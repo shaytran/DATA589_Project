@@ -32,7 +32,7 @@ Lastly, a Poisson point process model was fit on the eagle point patterns using 
 
 ## Results & Discussion
 Visual inspection revealed spatial variation in eagle occurrences, with clusters observed in certain areas. Quadrat testing indicated significant deviations from homogeneity, supporting the presence of spatial variation.
-![](https://github.com/shaytran/DATA589_Project/blob/main/images/point data.png)
+![](https://github.com/shaytran/DATA589_Project/blob/main/images/point_data.png)
 ![](https://github.com/shaytran/DATA589_Project/blob/main/images/quadrat.png)
 
 The kernel estimation intensity plot further supports the observed deviation from homogeneity.
