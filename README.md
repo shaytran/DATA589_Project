@@ -15,9 +15,11 @@ This study leverages a dataset of bald eagle (Haliaeetus leucocephalus) occurren
 
 ## Methodology
 **Data Preparation**
+
 The initial dataset comprises 1,049,411 observations of bald eagles across Canada. After pre-processing the dataset through filtering to BC only observations and removing observations without coordinate information. The dataset size was shrinked to 451,160 observations. Then random sampling without replacement was applied to ensure that subsequent analyses in R could proceed smoothly. Detail of the data pre-processing can be found in the [data_sampling_script.R](https://github.com/shaytran/DATA589_Project/blob/main/data/data_sampling_script.R) file under the data folder. 
 
 **Exploratory data analysis**
+
 The analysis begins with first moment statistics, which includes: 
 1. `Intensity Calculation`: The intensity of occurrences, a first moment measure, was computed to estimate the average density of eagle sightings per square kilometer.
 2. `Quadrat Testing`: The study area was divided into a 10x10 grid of quadrats to evaluate the spatial uniformity of eagle occurrences using a quadrat test to identify potential clustering.
